@@ -1,11 +1,10 @@
 steps:
   - pwsh: |
-      Write-Host "Artifactnames " $env:ARTIFACT_NAMES
-      $Artifacts = $env:ARTIFACT_NAMES -split ";"
-      foreach ($artifact in $Artifacts)
-      {
-        Write-Host $artifact
-      }
+      $ArtifactNames = @()
+      $EnVars = [Environment]::GetEnvironmentVariables()
+      $ArtifactNames = $EnVars.GetEnumerator() | Where-Object { $_.Key -like "XYZ*" }
+      $ArtifactNames
     displayName: Arrange Artifacts
     env:
-      ARTIFACT_NAMES: ${{ join(';', parameters.Artifacts ) }}
+      ${{ each artifact in parameters.Artifacts }}:
+        ${{ format('XYZ', artifact.safeName) }}: ${{ artifact.name }}
